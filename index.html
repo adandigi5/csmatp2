@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quiz: Ciencia de los Materiales</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root{--bg:#FFFFFF;--surface:#F4F3FA;--surface-fixed:#E6E3F2;--border:#202030;--text:#202030;--text-muted:#5E5E6A;--accent:#4737FF;--on-accent:#FFFFFF;--accent-soft:#D1CDFF;--ok:#A5E635;--ok-soft:#CDF28A;--ok-edge:#5E9A0C;--bad:#F94500;--bad-soft:#FFC2A6;--ink:#202030;--on-ok-soft:#202030;--overlay:rgba(16,16,24,.55);--track:rgba(32,32,48,.14);--switch-off:#B9B8C6;--knob:#FFFFFF}
+[data-theme="dark"]{--bg:#101018;--surface:#202030;--surface-fixed:#181826;--border:#5E5E6A;--text:#FFFFFF;--text-muted:#D1CDFF;--accent:#4737FF;--on-accent:#FFFFFF;--accent-soft:#ACA5FF;--ok:#B9F55A;--ok-soft:#2A3318;--ok-edge:#B9F55A;--bad:#F94500;--bad-soft:rgba(249,69,0,.14);--ink:#202030;--on-ok-soft:#FFFFFF;--overlay:rgba(0,0,0,.65);--track:rgba(255,255,255,.14);--switch-off:#5E5E6A;--knob:#FFFFFF}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;width:100%;overflow-x:hidden}
+body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);transition:background .25s,color .25s;font-size:clamp(.92rem,3.8vw,1rem);line-height:1.4}
+button{font:inherit;color:inherit;cursor:pointer}
+.card{background:var(--surface);border:2px solid var(--border);border-bottom-width:4px;border-radius:18px;transition:background .25s,border-color .25s}
+.screen{display:none;width:100%}
+.screen.active{display:flex}
+.wrap{width:100%;max-width:720px;margin:0 auto}
+.btn{min-height:46px;padding:10px 18px;border-radius:14px;border:2px solid var(--border);border-bottom-width:4px;background:var(--surface);font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-align:center}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--border)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:active:not(:disabled){transform:translateY(2px);border-bottom-width:2px}
+.circ{width:40px;height:40px;min-width:40px;border-radius:50%;border:2px solid var(--border);border-bottom-width:4px;background:var(--surface);display:grid;place-items:center;font-size:1.05rem;font-weight:800;padding:0}
+.circ.on{background:var(--accent-soft);color:var(--ink)}
+/* HOME */
+#home{height:100dvh;overflow:hidden;padding:max(10px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+#home .wrap{display:flex;flex-direction:column;gap:10px;height:100%;min-height:0}
+.head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}
+.head h1{margin:0;font-weight:800;font-size:clamp(1.55rem,6.8vw,2.3rem);line-height:1.15}
+.head .grp{display:flex;gap:8px;flex-shrink:0}
+.sec{padding:10px 12px}
+.sec-title{font-weight:800;font-size:.85rem;color:var(--text-muted);margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em}
+#unitsSec{flex:1;min-height:0;display:flex;flex-direction:column}
+.units-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;flex-shrink:0}
+.units-top .btn{min-height:44px;padding:6px 12px;font-size:.88rem}
+#unitsList{overflow-y:auto;min-height:0;flex:1;display:flex;flex-direction:column;gap:8px;padding-bottom:4px}
+.unit{display:flex;align-items:center;gap:10px;background:var(--bg);border:2px solid var(--border);border-bottom-width:4px;border-radius:14px;padding:8px 12px;min-height:48px;cursor:pointer;width:100%;text-align:left}
+.unit.on{background:var(--accent-soft);color:var(--ink)}
+.chk{width:24px;height:24px;border:2px solid var(--border);border-radius:7px;display:grid;place-items:center;flex:none;font-size:.9rem;font-weight:800}
+.unit.on .chk{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.unit .nm{font-weight:700;flex:1}
+.unit .ct{font-size:.82rem;color:var(--text-muted)}
+.unit.on .ct{color:var(--ink)}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.seg button{min-height:44px;border-radius:12px;border:2px solid var(--border);border-bottom-width:4px;background:var(--bg);font-weight:700}
+.seg button.on{background:var(--accent);color:var(--on-accent)}
+.tg-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex-shrink:0}
+.tg{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;min-height:52px;cursor:pointer;text-align:left;font-weight:700;font-size:.85rem;line-height:1.15;width:100%}
+.sw{width:42px;height:24px;border-radius:999px;background:var(--switch-off);position:relative;flex:none;transition:background .2s}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--knob);transition:transform .2s}
+.sw.on{background:var(--accent)}
+.sw.on::after{transform:translateX(18px)}
+#startBtn{width:100%;flex-shrink:0;min-height:52px;font-size:1.05rem}
+/* QUIZ */
+#quiz{height:100dvh;overflow:hidden}
+.qc{display:flex;flex-direction:column;width:100%;max-width:720px;min-width:0;margin:0 auto;height:100dvh;overflow:hidden;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);position:relative}
+.fixed{background:var(--surface-fixed);flex-shrink:0;transition:background .25s}
+.topbar{padding:max(8px,env(safe-area-inset-top)) 10px 8px;position:relative;border-bottom:2px solid var(--border)}
+.tb-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tb-l{display:flex;align-items:center;gap:8px;font-weight:800}
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:999px;background:var(--accent);color:var(--on-accent);font-weight:800;padding:3px 12px;font-size:.9rem}
+.tb-r{display:flex;gap:8px}
+.bar{height:10px;border-radius:999px;background:var(--track);margin-top:8px;overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:var(--accent);border-radius:999px;transition:width .35s}
+.qbox{padding:10px 14px;max-height:36dvh;overflow-y:auto}
+.ulabel{display:inline-block;color:var(--accent);font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+[data-theme="dark"] .ulabel{color:var(--accent-soft)}
+.qtext{font-weight:700;font-size:clamp(1rem,4.2vw,1.18rem);line-height:1.35;overflow-wrap:anywhere}
+.qscroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:12px 12px 10px;width:100%}
+.hint{font-size:.78rem;color:var(--text-muted);margin:0 0 8px;font-weight:600}
+.opt{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--bg);color:var(--text);border:2px solid var(--border);border-bottom-width:4px;border-radius:14px;padding:10px 12px;min-height:46px;margin-bottom:8px;overflow-wrap:anywhere}
+.mark{flex:none;width:24px;height:24px;border:2px solid var(--border);border-radius:50%;display:grid;place-items:center;font-size:.85rem;font-weight:800}
+.multi .mark{border-radius:7px}
+.opt.sel{background:var(--accent-soft);color:var(--ink);border-color:var(--accent)}
+.opt.sel .mark{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.opt.c-sel{background:var(--ok);color:var(--ink);border-color:var(--ok-edge)}
+.opt.c-sel .mark{background:var(--ink);color:var(--ok);border-color:var(--ink)}
+.opt.c-miss{background:var(--ok-soft);color:var(--on-ok-soft);border-color:var(--ok-edge)}
+.opt.c-miss .mark{border-color:var(--ok-edge)}
+.opt.w-sel{background:var(--bad);color:var(--ink);border-color:var(--bad)}
+.opt.w-sel .mark{background:var(--ink);color:var(--bad);border-color:var(--ink)}
+.opt:disabled{cursor:default}
+.fb{border:2px solid var(--border);border-bottom-width:4px;border-radius:14px;padding:12px 14px;margin-top:4px;font-weight:700}
+.fb.ok{background:var(--ok-soft);border-color:var(--ok-edge);color:var(--on-ok-soft)}
+.fb.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--text)}
+.fb .exp{font-weight:500;font-size:.88rem;margin-top:8px;line-height:1.4}
+.fb .cd{display:block;font-weight:500;font-size:.82rem;margin-top:4px;opacity:.85}
+.actions{padding:10px 12px max(10px,env(safe-area-inset-bottom));border-top:2px solid var(--border);flex-shrink:0}
+.actions .in{max-width:720px;margin:0 auto;display:flex}
+.actions .btn{width:100%;min-height:50px}
+[hidden]{display:none!important}
+/* MENUS */
+.menu{position:absolute;right:10px;top:calc(100% - 4px);z-index:30;min-width:230px;padding:8px;display:none;flex-direction:column;gap:6px}
+.menu.open{display:flex}
+.menu .mi{min-height:46px;border-radius:12px;border:2px solid var(--border);border-bottom-width:4px;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;font-weight:700;text-align:left;width:100%}
+/* MODALS */
+.ov{position:fixed;inset:0;background:var(--overlay);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.ov.open{display:flex}
+.modal{width:100%;max-width:460px;max-height:92dvh;overflow-y:auto;padding:18px}
+.modal h2{margin:0 0 8px;font-weight:800;font-size:1.35rem}
+.modal p{margin:0 0 12px;color:var(--text-muted)}
+.mbtns{display:flex;gap:8px;margin-top:14px;justify-content:flex-end;flex-wrap:wrap}
+.mbtns .btn{min-width:100px}
+.fld{width:100%;min-height:50px;font:inherit;font-size:1rem;padding:10px 14px;border-radius:12px;border:2px solid var(--border);border-bottom-width:4px;background:var(--bg);color:var(--text);margin-bottom:10px}
+.lbl{font-weight:700;display:block;margin:2px 0 6px}
+.status{font-size:.82rem;color:var(--text-muted);margin:6px 0}
+.srow{display:flex;align-items:center;gap:10px;background:var(--bg);border:2px solid var(--border);border-bottom-width:4px;border-radius:12px;padding:8px 10px;margin-bottom:8px}
+.srow.me{background:var(--accent-soft);color:var(--ink)}
+.pos{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);display:grid;place-items:center;font-weight:800;flex:none;font-size:.85rem}
+.sinfo{flex:1;min-width:0}
+.sname{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sdate{font-size:.75rem;color:var(--text-muted)}
+.srow.me .sdate{color:var(--ink)}
+.sbadge{background:var(--accent);color:var(--on-accent);border-radius:999px;padding:3px 10px;font-weight:800;font-size:.8rem;white-space:nowrap}
+/* RESULTS */
+#results{min-height:100dvh;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+#results .wrap{display:flex;flex-direction:column;gap:12px;position:relative}
+.rtop{display:flex;justify-content:flex-end}
+.final{text-align:center;padding:28px 16px;font-weight:800;font-size:clamp(1.3rem,6vw,1.8rem)}
+.rbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+details.card{padding:0}
+details>summary{list-style:none;cursor:pointer;padding:14px 16px;font-weight:800;display:flex;align-items:center;justify-content:space-between;min-height:50px}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:'';width:10px;height:10px;border-right:3px solid currentColor;border-bottom:3px solid currentColor;transform:rotate(45deg);transition:transform .2s;margin-right:4px}
+details[open]>summary::after{transform:rotate(-135deg)}
+.dbody{padding:0 14px 14px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.tabs button{min-height:44px;padding:6px 14px;border-radius:999px;border:2px solid var(--border);border-bottom-width:4px;background:var(--bg);font-weight:700;font-size:.88rem}
+.tabs button.on{background:var(--accent);color:var(--on-accent)}
+.rev{background:var(--bg);border:2px solid var(--border);border-left-width:8px;border-radius:14px;padding:12px;margin-bottom:10px}
+.rev.ok{border-left-color:var(--ok-edge)}
+.rev.bad{border-left-color:var(--bad)}
+.rev .rq{font-weight:700;margin-bottom:8px;overflow-wrap:anywhere}
+.rev .ru{font-size:.75rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;margin-bottom:4px}
+.ro{border-radius:10px;padding:6px 10px;margin-bottom:6px;font-size:.9rem;border:2px solid var(--border);overflow-wrap:anywhere}
+.ro.ok{background:var(--ok);color:var(--ink);border-color:var(--ok-edge)}
+.ro.bad{background:var(--bad);color:var(--ink);border-color:var(--bad)}
+.ro.miss{background:var(--ok-soft);color:var(--on-ok-soft);border-color:var(--ok-edge)}
+.rev .rx{font-size:.86rem;color:var(--text-muted);margin-top:6px}
+@media (min-width:600px){#home .wrap{gap:14px}.sec{padding:14px 16px}}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<section id="home" class="screen active">
+ <div class="wrap">
+  <div class="head">
+   <h1>Quiz: Ciencia de los Materiales</h1>
+   <div class="grp">
+    <button class="circ" id="cloudBtn" aria-label="Guardar en la nube"><i class="ti ti-cloud"></i></button>
+    <button class="circ" id="scoreBtn" aria-label="Tabla de puntajes">#</button>
+    <button class="circ" id="themeBtnHome" aria-label="Cambiar tema"></button>
+   </div>
+  </div>
+  <div class="card sec" id="unitsSec">
+   <div class="units-top"><p class="sec-title" style="margin:0">Unidades</p><button class="btn" id="allBtn"></button></div>
+   <div id="unitsList"></div>
+  </div>
+  <div class="card sec" style="flex-shrink:0">
+   <p class="sec-title">Cantidad de preguntas</p>
+   <div class="seg" id="countSeg"></div>
+  </div>
+  <div class="tg-row">
+   <button class="card tg" data-tg="exp"><span>&#x26AF;&#xFE0E; Mostrar explicaciones</span><span class="sw" data-sw="exp"></span></button>
+   <button class="card tg" data-tg="auto"><span>&#x23ED;&#xFE0E; Auto-avance en aciertos</span><span class="sw" data-sw="auto"></span></button>
+  </div>
+  <button class="btn primary" id="startBtn">&#x25B6;&#xFE0E; Comenzar quiz</button>
+ </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz" class="screen">
+ <div class="qc">
+  <div class="fixed topbar">
+   <div class="tb-row">
+    <div class="tb-l"><span id="qCounter">1/1</span><span class="badge" id="qScore">&#x2605;&#xFE0E; 0</span></div>
+    <div class="tb-r">
+     <button class="circ" id="setBtn" aria-label="Ajustes">&#x23E3;&#xFE0E;</button>
+     <button class="circ" id="menuBtn" aria-label="Menú">&#x2AF6;&#x2630;&#xFE0E;</button>
+    </div>
+   </div>
+   <div class="bar"><i id="barFill"></i></div>
+   <div class="card menu" id="setMenu">
+    <button class="mi" id="miTheme"></button>
+    <button class="mi" data-tg="exp"><span>&#x26AF;&#xFE0E; Mostrar explicaciones</span><span class="sw" data-sw="exp"></span></button>
+    <button class="mi" data-tg="auto"><span>&#x23ED;&#xFE0E; Auto-avance en aciertos</span><span class="sw" data-sw="auto"></span></button>
+   </div>
+   <div class="card menu" id="mainMenu">
+    <button class="mi" id="miScores">&#x2605;&#xFE0E; Tabla de puntajes</button>
+    <button class="mi" id="miRestart">&#x21BA; Reiniciar cuestionario</button>
+    <button class="mi" id="miHome">&#x1F3E0;&#xFE0E; Menú inicial</button>
+   </div>
+  </div>
+  <div class="fixed qbox"><span class="ulabel" id="qUnit"></span><div class="qtext" id="qText"></div></div>
+  <div class="qscroll" id="qScroll"><p class="hint" id="qHint" hidden>Seleccioná todas las correctas y presioná Verificar.</p><div id="qOpts"></div><div id="qFb"></div></div>
+  <div class="fixed actions" id="qBar" hidden><div class="in"><button class="btn primary" id="btnVerify" hidden disabled>Verificar</button><button class="btn primary" id="btnNext" hidden></button></div></div>
+ </div>
+</section>
+
+<!-- RESULTS -->
+<section id="results" class="screen">
+ <div class="wrap">
+  <div class="rtop"><button class="circ" id="themeBtnRes" aria-label="Cambiar tema"></button></div>
+  <div class="card final" id="finalMsg"></div>
+  <div class="rbtns"><button class="btn primary" id="repeatBtn">Repetir quiz</button><button class="btn" id="newBtn">Nuevo quiz</button></div>
+  <details class="card" id="revDet"><summary>&#x1F50D;&#xFE0E; Revisión completa</summary><div class="dbody"><div class="tabs" id="revTabs"></div><div id="revList"></div></div></details>
+  <details class="card" id="scoreDet"><summary>&#x2605;&#xFE0E; Tabla de puntajes</summary><div class="dbody" id="scoreResBody"></div></details>
+ </div>
+</section>
+
+<!-- MODALS -->
+<div class="ov" id="ovName"><div class="card modal"><h2>Tu nombre</h2><p>Ingresalo para que aparezca en la tabla de puntajes.</p><input class="fld" id="nameInp" maxlength="40" autocomplete="off" placeholder="Nombre"><div class="mbtns"><button class="btn" data-close>Cancelar</button><button class="btn primary" id="nameOk" disabled>&#x25B6;&#xFE0E; Comenzar</button></div></div></div>
+<div class="ov" id="ovCloud"><div class="card modal"><h2>Guardar en la nube</h2><p>Para ver tu progreso en varios dispositivos, pegá la URL de tu Firebase Realtime Database y elegí un código (el mismo en todos tus dispositivos).</p><input class="fld" id="cUrl" type="url" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="https://tu-proyecto-default-rtdb.firebaseio.com"><label class="lbl" for="cCode">Código</label><input class="fld" id="cCode" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Elegí un código"><div class="status" id="cStatus"></div><div class="mbtns"><button class="btn" data-close>Cerrar</button><button class="btn" id="cOff" hidden>Desconectar</button><button class="btn primary" id="cOn">Conectar</button></div></div></div>
+<div class="ov" id="ovScores"><div class="card modal"><h2>&#x2605;&#xFE0E; Tabla de puntajes</h2><div id="scoreModalBody"></div><div class="mbtns"><button class="btn" data-close>Cerrar</button></div></div></div>
+<div class="ov" id="ovConfirm"><div class="card modal"><h2 id="cfT"></h2><p id="cfP"></p><div class="mbtns"><button class="btn" data-close>Cancelar</button><button class="btn primary" id="cfOk">Confirmar</button></div></div></div>
+
+<script>
+const QUESTIONS = [
+// >>> PEGAR AQUÍ LAS PREGUNTAS Y RESPUESTAS (formato {u,q,opts,a,exp}) <<<
+/* ===== TEORÍA ===== */
+{u:"Teoría",q:"¿Cuál es el método principal para aumentar la resistencia de una aleación de aluminio de las series 3XXX o 5XXX?",opts:["Solubilizado, temple y envejecido artificial","Deformación en frío (acritud) con temples H","Recocido de recristalización completo","Envejecido natural posterior al solubilizado"],a:[1],exp:{ok:"Las series 3XXX (Al-Mn) y 5XXX (Al-Mg) no son tratables térmicamente: el método principal es la acritud (laminado o trefilado en frío), que aumenta la densidad de dislocaciones y las traba entre sí.",wrong:"Solubilizado y envejecido (temples T) solo sirven en aleaciones tratables térmicamente (2XXX, 6XXX, 7XXX). El recocido elimina la acritud y baja la resistencia."}},
+{u:"Teoría",q:"¿Cuáles de estos mecanismos aumentan la resistencia de una aleación 3XXX o 5XXX?",opts:["Solución sólida de Mn o Mg","Afinado de grano por deformación y recristalización controlada","Solubilizado y envejecido artificial (temple T6)","Recocido total (temple O)","Deformación plástica en frío"],a:[0,1,4],exp:{ok:"La acritud, la solución sólida (Mn o Mg distorsionan el retículo) y el afinado de grano (más bordes de grano) frenan las dislocaciones. Las fases Al₆Mn y Al₃Mg₂ también ayudan si están finas y dentro del grano.",wrong:"El temple T6 exige una aleación tratable térmicamente, y el recocido (O) elimina la acritud: es el que baja la resistencia al máximo."}},
+{u:"Teoría",q:"En el aluminio, ¿qué indica un temple H14?",opts:["Solubilizado y envejecido artificialmente","Como fabricado, sin garantía de propiedades","Recocido, con la máxima ductilidad","Endurecido por deformación en frío, a ½ duro"],a:[3],exp:{ok:"H indica endurecimiento por deformación. El segundo dígito marca el grado: 2 = ¼ duro, 4 = ½ duro, 8 = duro total, 9 = extraduro.",wrong:"Solubilizado y envejecido es el grupo T; como fabricado es F; recocido es O."}},
+{u:"Teoría",q:"En el proceso Bayer, ¿con qué se trata la bauxita triturada durante la digestión?",opts:["Criolita fundida a unos 900 °C","Ácido sulfúrico diluido a temperatura ambiente","Cloruro de sodio con amoníaco y CO₂","Soda cáustica a alta presión y unos 240 °C"],a:[3],exp:{ok:"La soda cáustica (NaOH) disuelve los minerales de aluminio como aluminato de sodio; las impurezas quedan sólidas y se eliminan después como barro rojo.",wrong:"La criolita se usa en Hall–Héroult (electrólisis), no en Bayer. El cloruro de sodio con amoníaco corresponde al método Solvay de la soda."}},
+{u:"Teoría",q:"En el proceso Hall–Héroult, ¿en qué medio se disuelve la alúmina para electrolizarla?",opts:["Soda cáustica caliente","Criolita fundida a unos 900 °C","Aluminato de sodio en agua","Hidróxido de aluminio sólido"],a:[1],exp:{ok:"La mezcla de criolita fundida (fluoruro de aluminio, F₃Al en el apunte) con Al₂O₃ funde a unos 900 °C y forma el baño electrolítico.",wrong:"La soda cáustica se usa en la digestión del proceso Bayer, que fabrica la alúmina que luego se electroliza."}},
+{u:"Teoría",q:"En la celda Hall–Héroult, ¿qué ocurre con el aluminio?",opts:["Toma electrones en el cátodo y el metal se acumula en el fondo de la cuba","Deja electrones en el ánodo y sube a la superficie del baño","Se forma por calcinación del hidróxido sobre el cátodo","Se forma por reducción con coque dentro de la cuba"],a:[0],exp:{ok:"El ion aluminio toma en el cátodo los electrones que deja el ion flúor en el ánodo, se transforma en aluminio metálico y se deposita en el fondo, de donde se cuela en lingotes.",wrong:"El ánodo es donde el flúor deja sus electrones (flúor naciente), y la calcinación del hidróxido pertenece al proceso Bayer."}},
+{u:"Teoría",q:"¿Cuáles son usos del aluminio puro (99,9 %)?",opts:["Conductores eléctricos, como cables y líneas de transmisión","Blíster para medicamentos","Espejos reflectores de lámparas e iluminación LED","Matrices de forja en caliente de aceros","Herramientas de corte para aceros endurecidos"],a:[0,1,2],exp:{ok:"El Al puro se usa en la industria eléctrica, en envases (papel de aluminio, blíster), en óptica (espejos reflectores) y en piezas aeroespaciales que requieren resistencia a bajas temperaturas.",wrong:"Matrices de forja y herramientas de corte necesitan dureza y resistencia al calor que el aluminio puro no tiene."}},
+{u:"Teoría",q:"¿A qué se debe la mayor densidad del polietileno de alta densidad (PEAD) frente al de baja densidad?",opts:["Cadenas muy ramificadas que dejan poco volumen libre","Cadenas lineales con muy pocas ramificaciones, que se empaquetan mejor","Un entrecruzamiento covalente entre cadenas mediante azufre","Un monómero de mayor peso molecular que el del PEBD"],a:[1],exp:{ok:"Las cadenas lineales del PEAD se empaquetan mejor y forman más regiones cristalinas: mayor densidad, rigidez y resistencia.",wrong:"En el PEBD las ramificaciones dejan más volumen libre, por eso es menos denso y más flexible. Ambos se obtienen del mismo monómero (etileno)."}},
+{u:"Teoría",q:"¿Cómo se obtiene el polietileno de baja densidad (PEBD)?",opts:["Por polimerización catalítica con Ziegler-Natta a baja presión","Por radicales libres, a alta presión y temperatura, con un iniciador como un peróxido","Por condensación, con liberación de agua como subproducto","Por vulcanización del etileno con azufre y calor"],a:[1],exp:{ok:"El PEBD se fabrica con un iniciador de radicales libres (peróxido orgánico) a alta presión y temperatura, lo que produce cadenas ramificadas.",wrong:"Ziegler-Natta, Phillips o metalocenos dan PEAD (cadenas lineales). El polietileno se forma por adición, no por condensación."}},
+{u:"Teoría",q:"Una costura soldada de 50 m, de estructura martensítica, puede tener fisuras superficiales y subsuperficiales. ¿Qué END resulta técnica y económicamente más viable?",opts:["Radiografía industrial","Líquidos penetrantes","Ultrasonido con palpador angular","Partículas magnetizables"],a:[3],exp:{ok:"La martensita es ferromagnética; las partículas detectan fisuras superficiales y subsuperficiales (hasta ≈4 mm), y con un yugo portátil se barren grandes longitudes con poca limpieza.",wrong:"Los líquidos penetrantes exigen limpieza estricta, penetración, remoción y revelado, lo que los hace lentos en 50 m. Ultrasonido y radiografía son más costosos y apuntan a defectos internos."}},
+{u:"Teoría",q:"En el ensayo con partículas magnetizables, ¿por qué se magnetiza en dos direcciones a 90°?",opts:["Porque así se duplica la intensidad del campo magnético","Porque se evita la desmagnetización final de la pieza","Porque las fisuras paralelas a las líneas de fuerza no generan campo de fuga","Porque las partículas solo se adhieren a campos cruzados"],a:[2],exp:{ok:"Una fisura perpendicular a las líneas de fuerza genera campo de fuga que atrapa partículas; una paralela casi no distorsiona el campo y pasa inadvertida.",wrong:"La desmagnetización se hace al final igual, y la intensidad del campo no depende de la dirección elegida."}},
+{u:"Teoría",q:"Se debe ensayar una soldadura de penetración total en un tanque de 25 mm de espesor lleno de aceite, buscando fisuras internas en el cordón y la ZAC. ¿Qué END conviene?",opts:["Partículas magnetizables, porque la martensita es ferromagnética","Líquidos penetrantes, porque el aceite facilita la capilaridad","Ultrasonido pulso-eco, con acceso por un solo lado","Inspección visual con boroscopio"],a:[2],exp:{ok:"Para fisuras internas hace falta un método volumétrico: el ultrasonido inspecciona desde un solo lado, detecta fisuras planas y no obliga a vaciar el tanque.",wrong:"Las partículas llegan solo a ≈4 mm de profundidad; los penetrantes y la inspección visual detectan únicamente defectos superficiales, y la radiografía requiere acceso por ambos lados."}},
+{u:"Teoría",q:"¿En qué consiste la vulcanización del caucho?",opts:["En entrecruzar las cadenas mediante puentes de azufre entre dobles enlaces","En disolver el caucho en solventes orgánicos para moldearlo","En polimerizar isopreno con peróxidos orgánicos","En endurecerlo por enfriamiento por debajo de su Tg"],a:[0],exp:{ok:"El azufre (≈140 °C, acelerado con compuestos orgánicos) une cadenas vecinas por sus dobles enlaces y forma una red con pocos enlaces cruzados.",wrong:"Polimerizar isopreno es sintetizar el caucho; la vulcanización es un entrecruzamiento posterior del polímero ya formado."}},
+{u:"Teoría",q:"¿Qué se logra con la vulcanización?",opts:["Mayor resistencia mecánica y elasticidad recuperable","Mayor estabilidad térmica del caucho","Insolubilidad: el caucho se hincha pero no se disuelve","Mayor plasticidad y pegajosidad con el calor"],a:[0,1,2],exp:{ok:"La red entrecruzada da más resistencia, elasticidad recuperable, estabilidad térmica, insolubilidad y mejor resistencia química y al desgaste. Con <4 % de S se obtiene goma blanda; con ≈45 %, ebonita rígida.",wrong:"El caucho crudo es el que se deforma plásticamente y se pone pegajoso con calor; la vulcanización corrige justamente eso."}},
+{u:"Teoría",q:"¿Qué función cumple el plomo en el latón de corte rápido (≈3 % Pb)?",opts:["Aumenta la resistencia a la tracción por solución sólida","Mejora la maquinabilidad: fragmenta la viruta y lubrica","Mejora la deformación plástica en frío","Aumenta la resistencia a la corrosión marina"],a:[1],exp:{ok:"El Pb es insoluble y queda como glóbulos dispersos; fragmenta la viruta y, por su bajo punto de fusión, actúa como lubricante y alarga la vida de la herramienta.",wrong:"Como contrapartida, el plomo reduce la capacidad de deformación en frío y es tóxico. No es un endurecedor por solución sólida."}},
+{u:"Teoría",q:"¿Cómo se forma la pieza en el rotomoldeo?",opts:["Un tubo plástico caliente se infla con aire dentro de un molde partido","Un polvo termoplástico funde en un molde hueco que gira en dos ejes y se adhiere por gravedad a las paredes","El plástico fundido se inyecta a presión en un molde refrigerado","Una resina líquida se proyecta sobre un caño que gira a gran velocidad"],a:[1],exp:{ok:"No hay presión ni fuerza centrífuga significativa: el polvo funde, se adhiere a las paredes y forma un espesor uniforme; el molde sigue girando mientras se enfría.",wrong:"Inflar un tubo es moldeo por soplado; inyectar es moldeo por inyección; proyectar sobre un caño giratorio es centrifugación."}},
+{u:"Teoría",q:"¿Qué polímero es el más usado en rotomoldeo y por qué?",opts:["Baquelita, porque cura con calor dentro del molde cerrado","Poliéster insaturado, porque se entrecruza con estireno","Polietileno, por su buena fluidez al fundir, estabilidad térmica, resistencia química y bajo costo","Teflón, por su alta resistencia química y su fluidez al fundir"],a:[2],exp:{ok:"El rotomoldeo usa termoplásticos en polvo, y el más común es el polietileno (también PP, PVC y nylon). Permite moldes baratos, piezas sin costuras y sin tensiones residuales.",wrong:"Baquelita y poliéster son termoestables, que no se funden en un ciclo de rotomoldeo."}},
+{u:"Teoría",q:"¿A qué piezas se aplica un cementado?",opts:["Aceros de alto carbono que deben templarse en masa","Aceros de bajo carbono (≈0,1–0,25 % C) que necesitan superficie dura y núcleo tenaz","Aleaciones de aluminio tratables térmicamente","Fundiciones blancas que necesitan mayor dureza"],a:[1],exp:{ok:"Se usa en engranajes, ejes, levas, bujes y pasadores: piezas con superficie resistente al desgaste y núcleo que absorbe impactos.",wrong:"Un acero de alto carbono ya endurece al templarse; el cementado se justifica cuando el acero tiene poco carbono."}},
+{u:"Teoría",q:"¿Cómo es el proceso de cementado?",opts:["El nitrógeno se combina con el hierro y forma nitruros superficiales","El acero se calienta a baja temperatura para recocer el núcleo","El carbono se elimina de la superficie para ablandarla","El carbono difunde desde un medio carburante hacia la capa externa del acero austenizado (≈850–950 °C), que luego se templa y reviene"],a:[3],exp:{ok:"La capa externa llega a ≈0,8–1 % C mientras el núcleo conserva el bajo C. Al templar y revenir, solo la capa rica en carbono se vuelve martensita dura: superficie dura y núcleo dúctil.",wrong:"Incorporar nitrógeno es el nitrurado, otro tratamiento termoquímico que forma nitruros."}},
+{u:"Teoría",q:"En la polimerización por adición, ¿qué ocurre en la etapa de iniciación?",opts:["Un peróxido orgánico genera radicales libres que abren el doble enlace del primer monómero","Dos cadenas en crecimiento se combinan y dejan de crecer","Los monómeros reaccionan liberando agua como subproducto","El azufre une cadenas vecinas formando puentes"],a:[0],exp:{ok:"El iniciador (por ejemplo, peróxido de benzoílo) se descompone en radicales libres que rompen el doble enlace C=C del monómero. Luego vienen la propagación y la terminación.",wrong:"La combinación de cadenas es una forma de terminación; liberar agua es propio de la condensación; los puentes de azufre corresponden a la vulcanización."}},
+{u:"Teoría",q:"La polimerización por adición produce polímeros de qué tipo, y ¿cuáles son ejemplos?",opts:["Termofijos, como la baquelita y el epoxi","Elastómeros vulcanizados, como la ebonita","Termofijos, como el poliéster insaturado","Termoplásticos, como PE, PP, PVC y PS"],a:[3],exp:{ok:"Sin subproductos, forma cadenas lineales o ramificadas unidas por fuerzas secundarias: ablandan con calor y se reciclan.",wrong:"Baquelita, epoxi y poliéster son termoestables, que se obtienen por condensación con entrecruzamiento."}},
+{u:"Teoría",q:"En la designación de aleaciones de aluminio para conformado (XXXX), ¿qué indica el primer dígito?",opts:["El tratamiento térmico aplicado","El grado de dureza por deformación","El aleante principal","El contenido de aluminio puro"],a:[2],exp:{ok:"1 = Al ≥ 99 %, 2 = Cu, 3 = Mn, 4 = Si, 5 = Mg, 6 = Mg + Si, 7 = Zn, 8 = otros (Li), 9 = sin usar.",wrong:"El tratamiento y el grado de dureza se indican con letras y dígitos después del código (F, O, H, W, T)."}},
+{u:"Teoría",q:"¿Qué series de aluminio son tratables térmicamente (endurecen por precipitación)?",opts:["1XXX","2XXX","3XXX","5XXX","6XXX","7XXX"],a:[1,4,5],exp:{ok:"2XXX (Cu), 6XXX (Mg + Si) y 7XXX (Zn) endurecen por precipitación (temples T).",wrong:"1XXX, 3XXX, 4XXX y 5XXX no son tratables térmicamente: endurecen por acritud (temples H)."}},
+{u:"Teoría",q:"¿Qué significa el temple T6 en una aleación de aluminio?",opts:["Solubilizado y envejecido natural","Solubilizado y envejecido artificial (máxima resistencia estándar)","Enfriado desde conformación y envejecido artificial","Solubilizado, trabajado en frío y envejecido natural"],a:[1],exp:{ok:"T6 = solubilizado + envejecido artificial, el tratamiento de máxima resistencia estándar.",wrong:"T4 es solubilizado + envejecido natural; T5 es enfriado desde conformación + envejecido artificial; T3 incluye trabajo en frío."}},
+{u:"Teoría",q:"¿Por qué Vickers eligió un ángulo de 136° entre caras para su penetrador piramidal?",opts:["Para que la huella sea más profunda que la de Rockwell","Para que sus valores coincidan con los de Brinell en la relación óptima d/D ≈ 0,375","Para soportar cargas mayores de 120 kg sin romperse","Para medir profundidad en vez de diagonales"],a:[1],exp:{ok:"Con d/D ≈ 0,375, las tangentes a la esfera en los bordes de la huella forman ≈136°: la pirámide da una huella geométricamente semejante a la de la bola en su condición óptima.",wrong:"Vickers mide diagonales (no profundidad) y usa cargas pequeñas (1 a 120 kg); el ángulo se eligió para empatar con Brinell."}},
+{u:"Teoría",q:"¿Cómo aumentaría la resistencia de un AA1145 sin cambiar de aleación?",opts:["Con solubilizado y envejecido artificial","Con deformación en frío, hasta los temples H12, H14 o H18","Con un recocido de recristalización","Agregándole Mn o Mg"],a:[1],exp:{ok:"Es aluminio comercialmente puro (≥99,45 % Al, serie 1XXX): no es tratable térmicamente y su solución sólida es muy pobre. La vía es la acritud.",wrong:"Agregar Mn o Mg aumentaría la resistencia, pero el material pasaría a ser 3XXX o 5XXX. El recocido, además, elimina la acritud."}},
+{u:"Teoría",q:"¿Qué diferencia a un copolímero de un homopolímero?",opts:["El copolímero está entrecruzado y el homopolímero es lineal","El copolímero tiene dos o más unidades distintas; el homopolímero, una sola que se repite","El homopolímero siempre es termoestable y el copolímero termoplástico","El copolímero se obtiene por condensación y el homopolímero por adición"],a:[1],exp:{ok:"Homopolímeros: PE, PP, PVC, PS, PTFE. Copolímeros: SBR (butadieno-estireno), NBR (butadieno-acrilonitrilo), HIPS y ABS. Combinan propiedades (el PS puro es frágil y con butadieno gana resistencia al impacto).",wrong:"La diferencia no está en el entrecruzamiento ni en el mecanismo de polimerización, sino en cuántos tipos de unidad repetitiva hay."}},
+{u:"Teoría",q:"¿Qué disposiciones pueden tener las unidades A y B en un copolímero?",opts:["Aleatoria","Alternada","En bloque","Injertada","Isotáctica"],a:[0,1,2,3],exp:{ok:"Aleatorio (A-A-B-A-B…), alternado (A-B-A-B), en bloque (A-A-A-B-B-B) e injertado (cadenas laterales de B sobre una cadena principal de A).",wrong:"Isotáctico describe la estereoquímica del polipropileno (grupo metilo siempre del mismo lado), no la secuencia de monómeros."}},
+{u:"Teoría",q:"¿Qué función cumple la matriz en un material compuesto?",opts:["Aporta la mayor parte de la rigidez y la resistencia","Une el refuerzo, lo protege, transmite los esfuerzos y frena grietas","Aumenta la anisotropía del conjunto","Es siempre cerámica y reacciona con el refuerzo"],a:[1],exp:{ok:"La matriz es continua y dúctil: une el refuerzo, distribuye los esfuerzos, lo protege y frena grietas. La adherencia matriz–refuerzo es crítica.",wrong:"La rigidez y resistencia las aporta la fase dispersa (fibras o partículas). La matriz puede ser polimérica, metálica o cerámica y el refuerzo no debe reaccionar con ella."}},
+{u:"Teoría",q:"¿Cuál es la secuencia correcta de operaciones en pulvimetalurgia?",opts:["Sinterizado, compactación, mezclado y obtención de polvos","Obtención de polvos, sinterizado, mezclado y compactación","Obtención de polvos, mezclado, compactación, sinterizado y acabado","Mezclado, fundición, colada y mecanizado"],a:[2],exp:{ok:"Se obtienen y clasifican los polvos, se mezclan con lubricantes, se compactan en matriz (≈45 kg/mm², hasta 80) y se sinterizan; luego puede haber acabado (dimensionado, acuñado, impregnación, infiltración).",wrong:"El sinterizado va siempre después de la compactación: une las partículas ya conformadas."}},
+{u:"Teoría",q:"¿A qué temperatura se sinteriza una pieza de pulvimetalurgia?",opts:["Entre el 70 y el 80 % de la temperatura de fusión","Por encima de la temperatura de fusión del componente principal","Al 25 % de la temperatura de fusión","A temperatura ambiente, con alta presión"],a:[0],exp:{ok:"La mayoría de los metales se sinterizan al 70–80 % de su temperatura de fusión (refractarios hasta 90 %), en atmósfera controlada, de 30 min a varias horas.",wrong:"Si se superara la fusión del componente principal, la pieza perdería forma; el sinterizado es difusión en estado sólido, no fusión."}},
+{u:"Teoría",q:"¿Qué piezas solo (o prácticamente solo) pueden fabricarse por pulvimetalurgia?",opts:["Piezas fundidas de gran tamaño","Metales refractarios, cermets y combinaciones de materiales insolubles entre sí","Piezas forjadas de alta resistencia","Perfiles extruidos de sección constante"],a:[1],exp:{ok:"Filamentos de W, Mo y Ti; metales duros como WC-Co (no se pueden fundir y colar); contactos W-Cu o W-Ag y escobillas Cu-grafito; filtros metálicos y bujes autolubricados con porosidad controlada.",wrong:"Las piezas fundidas, forjadas o extruidas se obtienen por otros procesos; la pulvimetalurgia se distingue por materiales y combinaciones imposibles de fundir."}},
+{u:"Teoría",q:"¿Cuáles son métodos de obtención de polvos metálicos?",opts:["Atomización con gas o agua","Reducción química de óxidos","Electrodeposición","Perdigonado","Laminación en frío"],a:[0,1,2,3],exp:{ok:"También se usan la molienda y la descomposición de carbonilos (Ni(CO)₄, Fe(CO)₅).",wrong:"La laminación en frío es un proceso de deformación plástica de metal macizo, no una forma de producir polvo."}},
+{u:"Teoría",q:"¿Cuál es la diferencia entre los ensayos de flexión por choque Charpy e Izod?",opts:["En Charpy la probeta está apoyada y se golpea la cara opuesta a la entalla; en Izod está en voladizo y se golpea del lado de la entalla, a 22 mm","En Charpy la probeta está en voladizo y en Izod, apoyada","Charpy mide dureza e Izod mide resiliencia","Charpy se hace solo en caliente e Izod solo a bajas temperaturas"],a:[0],exp:{ok:"Ambos miden la energía absorbida al romper una probeta entallada con un péndulo; permiten evaluar el comportamiento frente a cargas dinámicas y bajas temperaturas, y la tenacidad.",wrong:"Los dos son ensayos de impacto que pueden hacerse a distintas temperaturas; la diferencia está en el apoyo de la probeta y el punto de golpe."}},
+{u:"Teoría",q:"¿En qué metales aparece la transición dúctil–frágil?",opts:["Solo en los cúbicos de caras centradas (FCC)","En todos los metales por igual","En los cúbicos de cuerpo centrado (BCC) y hexagonales (HCP), no en los FCC","Solo en los hexagonales compactos"],a:[2],exp:{ok:"Es un rango de temperatura en el que la resistencia al impacto cae abruptamente y el material pasa de dúctil a frágil. No se observa en los FCC (como el aluminio).",wrong:"No todos los metales la presentan: los FCC mantienen su ductilidad a baja temperatura."}},
+
+/* ===== MC ===== */
+{u:"MC",q:"El anodizado en el aluminio:",opts:["Elimina la capa de óxido superficial","Puede darle color a la superficie y mejorar la resistencia al rozamiento","Es una capa superficial de óxido de aluminio de mayor espesor que la habitual","Es un tratamiento térmico superficial"],a:[1,2],exp:{ok:"El anodizado engrosa electroquímicamente la capa de óxido de aluminio; esa capa puede colorearse y mejora la resistencia al desgaste.",wrong:"No elimina el óxido: lo hace crecer. Y es un tratamiento electroquímico, no térmico."}},
+{u:"MC",q:"La tenacidad de un material es:",opts:["La capacidad de liberar la energía almacenada por el material cuando se quita la carga aplicada","Representada por el área encerrada debajo de la recta de proporcionalidad del ensayo de tracción","La capacidad de absorber energía para deformarse plásticamente antes de romperse","Representada por el área debajo de la curva del ensayo de tracción"],a:[2,3],exp:{ok:"Tenacidad: capacidad de absorber energía y deformarse plásticamente antes de romperse; en el ensayo de tracción se representa por el área debajo de toda la curva tensión–deformación (también se evalúa con el ensayo de impacto).",wrong:"Liberar energía elástica al descargar y el área bajo la recta de proporcionalidad corresponden a la resiliencia, que solo considera la zona elástica."}},
+{u:"MC",q:"El litio agregado al aluminio:",opts:["Disminuye la resistencia mecánica","Mejora la soldabilidad","Disminuye el módulo de elasticidad","Aumenta la resistencia a la corrosión"],a:[1,3],exp:{ok:"Se consideran correctas la mejora de la soldabilidad y el aumento de la resistencia a la corrosión de las aleaciones Al-Li, que además bajan la densidad.",wrong:"El litio aumenta (no disminuye) la resistencia mecánica y el módulo de elasticidad."}},
+{u:"MC",q:"Los latones alfa:",opts:["Son aleaciones de Cu con menos de 35 % de Zn","No se pueden endurecer por tratamiento térmico","Tienen como fase una solución sólida sustitucional","Son muy dúctiles y maleables, deformables plásticamente en frío","Tienen como fase una solución sólida intersticial","Se endurecen por solubilizado y envejecido"],a:[0,1,2,3],exp:{ok:"El Zn sustituye átomos de Cu en la red (solución sólida sustitucional). Son muy dúctiles, se deforman en frío y, como todos los latones, solo admiten recocido.",wrong:"No es una solución intersticial (el Zn tiene tamaño similar al Cu) y no son tratables térmicamente por precipitación."}},
+{u:"MC",q:"Las partículas magnetizables deberán tener:",opts:["Baja retentividad","Buen contraste con el material a ensayar","Buena movilidad","Baja permeabilidad magnética"],a:[0,1,2],exp:{ok:"Deben moverse con libertad, no retener magnetismo (baja retentividad), contrastar con la pieza y ser atraídas por los campos de fuga (alta permeabilidad).",wrong:"Una baja permeabilidad impediría que se concentren en el campo de fuga de la discontinuidad."}},
+{u:"MC",q:"En la radiografía industrial:",opts:["Las indicaciones más densas absorben más radiación","La energía de la radiación depende de su longitud de onda","La radiación puede afectar a las personas","La radiación se refleja en las indicaciones según su densidad","La radiación no afecta al material ni a las personas"],a:[0,1,2],exp:{ok:"La radiación atraviesa la pieza y se absorbe más en las zonas densas; su energía depende de la longitud de onda (E = h·ν, c = λ·ν); es ionizante y puede dañar células vivas.",wrong:"La radiación no se refleja en las indicaciones: se absorbe o se transmite y se registra en la película. Y sí afecta a las personas."}},
+{u:"MC",q:"¿Qué elementos participan en el proceso de flotación?",opts:["Colectores","Aire","Mineral molido a malla 200","Espumantes"],a:[0,3],exp:{ok:"Los colectores (hacen hidrófoba la superficie del mineral) y los espumantes (estabilizan la espuma) son los reactivos que intervienen en la flotación.",wrong:"El aire y el mineral molido son el medio y la materia prima del proceso, pero no se cuentan entre los reactivos que se agregan para flotar."}},
+{u:"MC",q:"¿Cuáles de las siguientes piezas se pueden obtener por termoformado?",opts:["Pelotas de goma","Bañeras","Blísteres de medicamentos","Platos y vasos de uso diario"],a:[1,2],exp:{ok:"El termoformado conforma láminas de termoplástico calentadas contra un molde (con vacío o presión), y permite piezas terminadas, incluso de gran tamaño.",wrong:"Las pelotas de goma son elastómeros vulcanizados en molde, y la vajilla de uso diario suele fabricarse por inyección."}},
+{u:"MC",q:"Cuando una pieza está sometida a cargas en una sola dirección, las mejores propiedades mecánicas se obtienen con un material compuesto reforzado con:",opts:["Fibras discontinuas orientadas al azar","Fibras continuas orientadas al azar","Fibras continuas alineadas en la misma dirección de la carga","Fibras discontinuas alineadas en la misma dirección de la carga"],a:[2],exp:{ok:"Las fibras continuas alineadas dan la máxima resistencia en la dirección de la fibra (aunque el material es muy anisotrópico).",wrong:"Las fibras cortas transmiten peor la carga (menor a la longitud crítica el efecto reforzador es insignificante) y la orientación al azar reparte la resistencia en todas direcciones."}},
+{u:"MC",q:"Si al ensayar con un palpador normal desaparece la indicación de fondo, esto puede atribuirse a:",opts:["Una indicación perpendicular al haz ultrasónico de mayor tamaño que este","La pared del fondo no es perpendicular al haz ultrasónico","Una indicación paralela al haz ultrasónico de mayor tamaño que esta","La pared del fondo es perpendicular al haz ultrasónico"],a:[0,1],exp:{ok:"Un defecto grande y perpendicular al haz refleja toda la energía y oculta el fondo; una pared de fondo inclinada desvía el haz y el eco no vuelve al palpador.",wrong:"Un defecto paralelo al haz casi no lo refleja, y una pared de fondo perpendicular devuelve el eco normalmente."}},
+{u:"MC",q:"Un material es dúctil cuando:",opts:["Se rompe sin deformarse plásticamente","Absorbe mucha energía antes de romperse","Absorbe poca energía antes de romperse","Se deforma plásticamente antes de romperse"],a:[1,3],exp:{ok:"La ductilidad es la capacidad de alargarse plásticamente sin romperse, lo que implica gran deformación y mucha energía absorbida (gran área bajo la curva).",wrong:"Romper sin deformarse y absorber poca energía describen un material frágil."}},
+{u:"MC",q:"¿Cuáles de las siguientes afirmaciones sobre el cobre blister NO son ciertas?",opts:["Se obtiene a partir de la mata de cobre","Es muy usado en la industria","Es refinado para su posterior uso industrial","Se desprende durante su solidificación CO que genera ampollas"],a:[1,3],exp:{ok:"El blister (≈98–99 % Cu) sale del convertidor y debe refinarse antes de usarse; las ampollas se deben al SO₂ que se desprende al solidificar, no a CO.",wrong:"Se obtiene de la mata de cobre y se refina: esas dos afirmaciones sí son ciertas."}},
+{u:"MC",q:"Los latones beta:",opts:["Se les agrega Pb para mejorar la deformación plástica en frío","Tienen más de 35 % y menos de 50 % de Zn","Presentan una fase beta ordenada por arriba de los 465 °C","Solo son deformables plásticamente en caliente"],a:[1,3],exp:{ok:"Tienen entre 35 y 50 % de Zn; la fase β' (ordenada) es dura y poco dúctil en frío, por eso solo se conforman en caliente.",wrong:"El Pb mejora la maquinabilidad, no la deformación en frío; y la fase beta es ordenada por debajo de ≈465 °C, no por encima."}},
+{u:"MC",q:"Se generan mayor cantidad de barreras al movimiento de las dislocaciones por:",opts:["Solubilizado de retención de fase","Precipitación de finos compuestos intermetálicos coherentes con la matriz","Tener mayor cantidad de borde de grano","Recocido de alivio de tensiones"],a:[1,2],exp:{ok:"Los precipitados finos y coherentes con la matriz y una mayor cantidad de bordes de grano (grano más fino) obstaculizan el movimiento de las dislocaciones.",wrong:"El solubilizado de retención de fase y el recocido de alivio de tensiones no generan barreras adicionales; el recocido de alivio incluso ablanda."}},
+{u:"MC",q:"En los plásticos espumados se consigue:",opts:["Reducir la densidad","Reducir la temperatura de fusión","Aumentar la aislación acústica","Aumentar la conductividad eléctrica"],a:[0,2],exp:{ok:"Las celdas con gas reducen la densidad y mejoran la aislación térmica y acústica (techos, paredes, antivibratorios).",wrong:"La espuma no cambia la temperatura de fusión del polímero ni lo hace más conductor: es un buen aislante."}},
+{u:"MC",q:"¿Cuáles de los siguientes son materiales compuestos?",opts:["Tetrapak","Madera","Cermets","Porcelanas"],a:[0,2],exp:{ok:"El tetrapak (laminado de capas de distintos materiales) y los cermets (metal más cerámico) son materiales compuestos.",wrong:"La porcelana es una cerámica vítrea y la madera es un material natural que no se cuenta aquí como compuesto de ingeniería."}},
+{u:"MC",q:"Indique las respuestas que representan desventajas de la fabricación de piezas por pulvimetalurgia:",opts:["Bajo tiempo de fabricación","Limitaciones de diseño","No se desperdicia material","Elevado costo de las matrices","Precisión dimensional y buen acabado","Inferiores características mecánicas"],a:[1,3,5],exp:{ok:"Desventajas: limitaciones de diseño (secciones uniformes, L/D acotada, sin contrasalidas), costo alto de matrices y propiedades mecánicas inferiores por la porosidad.",wrong:"Bajo tiempo de fabricación, ausencia de desperdicio y buena precisión son ventajas del proceso."}},
+{u:"MC",q:"El gráfico carga vs. alargamiento obtenido en la máquina de tracción se transforma en tensión vs. deformación:",opts:["Para que se puedan comparar las cargas aplicadas","Para que se puedan comparar los alargamientos","Para independizarse de las dimensiones de la probeta","Para que sean comparables los valores de tensiones y deformaciones"],a:[2],exp:{ok:"Dividir la carga por el área inicial (σ = F/A₀) y el alargamiento por la longitud inicial (ε = ΔL/L₀) hace que el resultado dependa lo menos posible de las dimensiones de la probeta.",wrong:"Comparar cargas o alargamientos sueltos no tiene sentido si las probetas son de distinto tamaño; la transformación busca independencia geométrica."}},
+{u:"MC",q:"El módulo de Young representa:",opts:["La resistencia a ser deformado plásticamente","El trabajo necesario para deformar elásticamente al material","La constante de proporcionalidad de la ley de Hooke","La pendiente de la recta de proporcionalidad"],a:[2,3],exp:{ok:"Es la constante entre tensión y deformación en el período elástico, es decir, la pendiente de la recta; mide la rigidez del material.",wrong:"El trabajo para deformar elásticamente es el módulo de resiliencia (área bajo la recta), y la deformación plástica no tiene que ver con E."}},
+{u:"MC",q:"Los dos principales tipos de reacciones por las que se puede llevar a cabo la polimerización son:",opts:["Oxidación","Condensación","Reducción","Adición"],a:[1,3],exp:{ok:"Adición (termoplásticos, sin subproductos) y condensación (termoestables, con subproductos como agua).",wrong:"Oxidación y reducción no describen mecanismos de polimerización."}},
+{u:"MC",q:"Los objetivos de la infiltración (en pulvimetalurgia) son:",opts:["Disminuir las propiedades mecánicas","Disminuir la densidad","Disminuir la cantidad de poros","Disminuir los poros angulares concentradores de tensión"],a:[2,3],exp:{ok:"Un metal fundido de menor punto de fusión llena los poros: aumenta la densidad y la resistencia (70 % a 100 %) y reduce los poros que concentran tensiones.",wrong:"La infiltración mejora, no empeora, las propiedades mecánicas, y aumenta (no disminuye) la densidad."}},
+{u:"MC",q:"Indique las respuestas que representan ventajas de la fabricación de piezas por pulvimetalurgia:",opts:["Bajo tiempo de fabricación","Limitaciones de diseño","No se desperdicia material","Elevado costo de las matrices","Precisión dimensional y buen acabado","Inferiores características mecánicas"],a:[0,2,4],exp:{ok:"Ventajas: alta velocidad de producción, casi sin desperdicio ni rechazos, formas complejas y precisión dimensional con buen acabado (casi sin maquinado).",wrong:"Limitaciones de diseño, costo de matrices y menores propiedades mecánicas son desventajas."}},
+{u:"MC",q:"El aluminio se caracteriza por:",opts:["Poseer una temperatura de fusión de 1085 °C","Poder reducirse por compresión (laminado) a espesores muy finos","Ser más liviano que las aleaciones de hierro y cobre utilizadas en la industria","Tener una estructura cristalina HCP","No tener temperatura de transición dúctil–frágil","Ser 100 % reciclable"],a:[1,2,4,5],exp:{ok:"El Al es muy maleable, liviano, de estructura FCC (por eso no tiene transición dúctil–frágil) y reciclable.",wrong:"Su fusión es de ≈660 °C (1085 °C es la del cobre) y su estructura es FCC, no HCP."}},
+{u:"MC",q:"La vida media de una fuente de gammagrafía:",opts:["Es el tiempo que tarda la fuente en agotarse","Es el tiempo en el que la energía de la fuente cae a la mitad de su valor","Es la energía que posee cuando alcanza la mitad de su vida útil","Es la energía que posee la fuente después de un año de uso"],a:[1],exp:{ok:"Es el tiempo tras el cual la actividad de la fuente radiactiva se reduce a la mitad; por eso algunas fuentes (como el cesio) deben renovarse.",wrong:"La fuente nunca se agota del todo: decae de forma continua. La vida media es un tiempo, no una energía."}}
+];
+
+/* ===== ESTADO ===== */
+const S={play:'\u25B6\uFE0E',gear:'\u23E3\uFE0E',next:'\u23ED\uFE0E',sun:'\u2600\uFE0E',moon:'\u263E\uFE0E',star:'\u2605\uFE0E',check:'\u2714\uFE0E',redo:'\u21BA',x:'\u2715'};
+let showExplanations=true, autoAdvance=true;
+let selUnits=new Set(), qCount=10, playerName='';
+let quiz=null, timer=null, tabFilter='all';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+const UNITS=[...new Set(QUESTIONS.map(q=>q.u))];
+const countOf=u=>QUESTIONS.filter(q=>q.u===u).length;
+
+/* ===== TEMA ===== */
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);lsSet('quizTheme',t);refreshThemeBtns()}
+function curTheme(){return document.documentElement.getAttribute('data-theme')}
+function refreshThemeBtns(){
+  const dark=curTheme()==='dark';
+  ['themeBtnHome','themeBtnRes'].forEach(id=>{$(id).textContent=dark?S.sun:S.moon});
+  $('miTheme').textContent=dark?S.sun+' Tema claro':S.moon+' Tema oscuro';
+}
+function toggleTheme(){applyTheme(curTheme()==='dark'?'light':'dark')}
+(function(){const sv=lsGet('quizTheme',null);const t=sv||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');applyTheme(t)})();
+
+/* ===== TOGGLES ===== */
+function syncToggleUI(){
+  document.querySelectorAll('[data-sw="exp"]').forEach(e=>e.classList.toggle('on',showExplanations));
+  document.querySelectorAll('[data-sw="auto"]').forEach(e=>e.classList.toggle('on',autoAdvance));
+}
+function onToggle(k){
+  if(k==='exp'){showExplanations=!showExplanations}
+  else{
+    autoAdvance=!autoAdvance;
+    if(!autoAdvance){clearTimer();const cd=document.querySelector('#qFb .cd');if(cd)cd.remove()}
+  }
+  syncToggleUI();
+}
+document.querySelectorAll('[data-tg]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();onToggle(b.dataset.tg)}));
+
+/* ===== HOME ===== */
+function renderHome(){
+  const L=$('unitsList');L.innerHTML='';
+  UNITS.forEach(u=>{
+    const b=document.createElement('button');b.type='button';b.className='unit'+(selUnits.has(u)?' on':'');
+    b.innerHTML='<span class="chk">'+(selUnits.has(u)?S.check:'')+'</span><span class="nm">'+esc(u)+'</span><span class="ct">'+countOf(u)+' preguntas</span>';
+    b.onclick=()=>{selUnits.has(u)?selUnits.delete(u):selUnits.add(u);renderHome()};
+    L.appendChild(b);
+  });
+  const all=selUnits.size===UNITS.length;
+  $('allBtn').textContent=(all?S.check+' Deseleccionar todas':S.check+' Seleccionar todas');
+  $('startBtn').disabled=selUnits.size===0;
+  const seg=$('countSeg');seg.innerHTML='';
+  [10,25,50,'Todas'].forEach(v=>{const b=document.createElement('button');b.type='button';b.textContent=v;b.className=(qCount===v?'on':'');b.onclick=()=>{qCount=v;renderHome()};seg.appendChild(b)});
+  syncToggleUI();
+  $('cloudBtn').classList.toggle('on',!!Cloud.cfg);
+}
+$('allBtn').onclick=()=>{if(selUnits.size===UNITS.length)selUnits.clear();else UNITS.forEach(u=>selUnits.add(u));renderHome()};
+function show(id){['home','quiz','results'].forEach(s=>$(s).classList.toggle('active',s===id));closeMenus()}
+function goHome(){clearTimer();show('home');renderHome()}
+
+/* ===== UTIL QUIZ ===== */
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const FIXED=/^(todas|ninguna|más de una|otra)\b/i;
+function prepare(q){
+  const idx=q.opts.map((_,i)=>i);
+  const mov=shuffle(idx.filter(i=>!FIXED.test(q.opts[i])));
+  const fix=idx.filter(i=>FIXED.test(q.opts[i]));
+  const order=mov.concat(fix);
+  return {u:q.u,q:q.q,opts:order.map(i=>q.opts[i]),a:q.a.map(i=>order.indexOf(i)),exp:q.exp};
+}
+function clearTimer(){if(timer){clearTimeout(timer);timer=null}}
+
+/* ===== INICIO DE QUIZ ===== */
+function askName(){
+  const inp=$('nameInp');inp.value=lsGet('quizName','');$('nameOk').disabled=!inp.value.trim();
+  openOv('ovName');setTimeout(()=>inp.focus(),50);
+}
+$('nameInp').addEventListener('input',e=>{$('nameOk').disabled=!e.target.value.trim()});
+$('nameInp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!$('nameOk').disabled)$('nameOk').click()});
+$('nameOk').onclick=()=>{playerName=$('nameInp').value.trim().slice(0,40);lsSet('quizName',playerName);closeOv('ovName');startQuiz()};
+$('startBtn').onclick=()=>{if(selUnits.size)askName()};
+function startQuiz(){
+  clearTimer();
+  const pool=shuffle(QUESTIONS.filter(q=>selUnits.has(q.u)));
+  const n=qCount==='Todas'?pool.length:Math.min(qCount,pool.length);
+  quiz={list:pool.slice(0,n).map(prepare),idx:0,score:0,answered:0,review:[],locked:false,sel:new Set()};
+  Track.start(playerName||lsGet('quizName',''),quiz.list.length);
+  show('quiz');renderQuestion();
+}
+function renderQuestion(){
+  clearTimer();
+  const q=quiz.list[quiz.idx];quiz.sel=new Set();quiz.locked=false;
+  const multi=q.a.length>1;
+  $('qCounter').textContent=(quiz.idx+1)+'/'+quiz.list.length;
+  $('qScore').textContent=S.star+' '+quiz.score;
+  $('barFill').style.width=(quiz.idx/quiz.list.length*100)+'%';
+  $('qUnit').textContent=q.u;$('qText').textContent=q.q;
+  $('qHint').hidden=!multi;
+  const box=$('qOpts');box.innerHTML='';box.className=multi?'multi':'single';
+  q.opts.forEach((t,i)=>{
+    const b=document.createElement('button');b.type='button';b.className='opt';b.dataset.i=i;
+    b.innerHTML='<span class="mark"></span><span>'+esc(t)+'</span>';
+    b.onclick=()=>pick(i);box.appendChild(b);
+  });
+  $('qFb').innerHTML='';
+  $('qScroll').scrollTop=0;
+  $('btnNext').hidden=true;
+  $('btnVerify').hidden=!multi;$('btnVerify').disabled=true;
+  $('qBar').hidden=!multi;
+}
+function pick(i){
+  if(quiz.locked)return;
+  const q=quiz.list[quiz.idx];
+  if(q.a.length===1){quiz.sel=new Set([i]);evaluate();return}
+  quiz.sel.has(i)?quiz.sel.delete(i):quiz.sel.add(i);
+  const b=$('qOpts').children[i];b.classList.toggle('sel',quiz.sel.has(i));
+  b.querySelector('.mark').textContent=quiz.sel.has(i)?S.check:'';
+  $('btnVerify').disabled=quiz.sel.size===0;
+}
+$('btnVerify').onclick=()=>{if(quiz&&!quiz.locked&&quiz.sel.size)evaluate()};
+function evaluate(){
+  const q=quiz.list[quiz.idx];quiz.locked=true;
+  const sel=[...quiz.sel],cor=q.a;
+  const ok=sel.length===cor.length&&sel.every(i=>cor.includes(i));
+  [...$('qOpts').children].forEach((b,i)=>{
+    const c=cor.includes(i),s=quiz.sel.has(i);b.disabled=true;b.classList.remove('sel');
+    const m=b.querySelector('.mark');m.textContent='';
+    if(c&&s){b.classList.add('c-sel');m.textContent=S.check}
+    else if(c){b.classList.add('c-miss');m.textContent=S.check}
+    else if(s){b.classList.add('w-sel');m.textContent=S.x}
+  });
+  quiz.answered++;if(ok)quiz.score++;
+  $('qScore').textContent=S.star+' '+quiz.score;
+  quiz.review.push({u:q.u,q:q.q,opts:q.opts,correct:cor.slice(),sel:sel,ok:ok,exp:q.exp});
+  Track.update(quiz.score,quiz.answered);
+  let h;
+  if(ok){h='<div class="fb ok">'+S.check+' Correcto.'+(autoAdvance?'<span class="cd"></span>':'')+'</div>'}
+  else{
+    h='<div class="fb bad">'+S.x.replace(S.x,'\u2717')+' Incorrecto. Respuesta correcta: '+cor.map(i=>esc(q.opts[i])).join(' · ');
+    if(showExplanations&&q.exp&&q.exp.wrong)h+='<div class="exp">'+esc(q.exp.wrong)+'</div>';
+    h+='</div>';
+  }
+  $('qFb').innerHTML=h;
+  $('btnVerify').hidden=true;
+  const last=quiz.idx>=quiz.list.length-1;
+  $('btnNext').hidden=false;$('btnNext').textContent=last?'Ver resultados':S.next+' Siguiente';
+  $('qBar').hidden=false;
+  const sc=$('qScroll');sc.scrollTop=sc.scrollHeight;
+  if(ok&&autoAdvance)countdown(2);
+}
+function countdown(n){
+  const cd=document.querySelector('#qFb .cd');if(!cd)return;
+  cd.textContent='Avanzando en '+n+'s…';
+  timer=setTimeout(()=>{if(n>1)countdown(n-1);else nextQuestion()},1000);
+}
+$('btnNext').onclick=()=>nextQuestion();
+function nextQuestion(){
+  clearTimer();if(!quiz)return;
+  quiz.idx++;
+  if(quiz.idx>=quiz.list.length)finish();else renderQuestion();
+}
+function finish(){
+  clearTimer();Track.finish();
+  $('barFill').style.width='100%';
+  const pct=quiz.list.length?Math.round(quiz.score/quiz.list.length*100):0;
+  $('finalMsg').textContent=pct+'% de respuestas correctas';
+  tabFilter='all';renderReview();
+  $('revDet').open=false;$('scoreDet').open=false;
+  show('results');window.scrollTo(0,0);
+}
+
+/* ===== REVISIÓN ===== */
+function renderReview(){
+  const okN=quiz.review.filter(r=>r.ok).length,badN=quiz.review.length-okN;
+  const tabs=[['all','Todas'],['ok',okN+(okN===1?' correcta':' correctas')],['bad',badN+(badN===1?' incorrecta':' incorrectas')]];
+  const T=$('revTabs');T.innerHTML='';
+  tabs.forEach(([k,t])=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.className=tabFilter===k?'on':'';b.onclick=()=>{tabFilter=k;renderReview()};T.appendChild(b)});
+  let h='';
+  quiz.review.forEach((r,n)=>{
+    if(tabFilter==='ok'&&!r.ok)return;if(tabFilter==='bad'&&r.ok)return;
+    h+='<div class="rev '+(r.ok?'ok':'bad')+'"><div class="ru">'+(n+1)+' · '+esc(r.u)+'</div><div class="rq">'+esc(r.q)+'</div>';
+    r.opts.forEach((t,i)=>{
+      const c=r.correct.includes(i),s=r.sel.includes(i);
+      if(s&&c)h+='<div class="ro ok">'+S.check+' '+esc(t)+'</div>';
+      else if(s)h+='<div class="ro bad">'+S.x+' '+esc(t)+'</div>';
+      else if(c&&!r.ok)h+='<div class="ro miss">'+S.check+' '+esc(t)+' (correcta, no marcada)</div>';
+    });
+    if(showExplanations&&r.exp){const x=r.ok?r.exp.ok:r.exp.wrong;if(x)h+='<div class="rx">'+esc(x)+'</div>'}
+    h+='</div>';
+  });
+  $('revList').innerHTML=h||'<p class="status">No hay preguntas en esta pestaña.</p>';
+}
+$('repeatBtn').onclick=()=>{playerName=lsGet('quizName','');startQuiz()};
+$('newBtn').onclick=goHome;
+$('scoreDet').addEventListener('toggle',()=>{if($('scoreDet').open)Scores.refresh().then(renderScoreViews)});
+
+/* ===== MENÚS ===== */
+function closeMenus(){$('setMenu').classList.remove('open');$('mainMenu').classList.remove('open')}
+$('setBtn').onclick=e=>{e.stopPropagation();const o=$('setMenu').classList.contains('open');closeMenus();if(!o)$('setMenu').classList.add('open')};
+$('menuBtn').onclick=e=>{e.stopPropagation();const o=$('mainMenu').classList.contains('open');closeMenus();if(!o)$('mainMenu').classList.add('open')};
+$('setMenu').addEventListener('click',e=>e.stopPropagation());
+$('mainMenu').addEventListener('click',e=>e.stopPropagation());
+document.addEventListener('click',closeMenus);
+$('miTheme').onclick=toggleTheme;
+$('miScores').onclick=()=>{closeMenus();openScores()};
+$('miRestart').onclick=()=>{closeMenus();confirmBox('Reiniciar cuestionario','Se vuelve a empezar con las mismas unidades y ajustes. Se pierde el progreso actual.',()=>{clearTimer();Track.abandonIfEmpty();startQuiz()})};
+$('miHome').onclick=()=>{closeMenus();confirmBox('Menú inicial','Se cancela el quiz en curso y volvés a la pantalla de inicio.',()=>{clearTimer();Track.abandonIfEmpty();goHome()})};
+['themeBtnHome','themeBtnRes'].forEach(id=>$(id).onclick=toggleTheme);
+
+/* ===== MODALES ===== */
+function openOv(id){$(id).classList.add('open')}
+function closeOv(id){$(id).classList.remove('open')}
+document.querySelectorAll('.ov').forEach(o=>{
+  o.addEventListener('mousedown',e=>{if(e.target===o)o.classList.remove('open')});
+  o.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>o.classList.remove('open')));
+});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  const open=[...document.querySelectorAll('.ov.open')];
+  if(open.length){open[open.length-1].classList.remove('open');return}
+  closeMenus();
+});
+let cfAction=null;
+function confirmBox(t,p,fn){$('cfT').textContent=t;$('cfP').textContent=p;cfAction=fn;openOv('ovConfirm')}
+$('cfOk').onclick=()=>{closeOv('ovConfirm');const f=cfAction;cfAction=null;if(f)f()};
+function openScores(){openOv('ovScores');Scores.refresh().then(renderScoreViews);renderScoreViews()}
+$('scoreBtn').onclick=openScores;
+
+/* ===== PUNTAJES ===== */
+const Scores={
+  list:[],ok:true,lastSync:null,
+  async refresh(){
+    if(Cloud.cfg){
+      try{
+        const r=await fetch(Cloud.addr(),{cache:'no-store'});
+        if(!r.ok)throw 0;
+        const d=await r.json();
+        this.list=d?Object.keys(d).map(k=>Object.assign({id:k},d[k])):[];
+        this.ok=true;this.lastSync=new Date();
+      }catch(e){this.ok=false}
+    }else{
+      try{this.list=JSON.parse(lsGet('quizScores','[]'))||[]}catch(e){this.list=[]}
+    }
+  }
+};
+const pad=n=>String(n).padStart(2,'0');
+function fmtDate(t){const d=new Date(t);return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes())}
+function renderScoreViews(){
+  let st;
+  if(Cloud.cfg){
+    st=Scores.ok&&Scores.lastSync?'Sincronizado con la nube · '+pad(Scores.lastSync.getHours())+':'+pad(Scores.lastSync.getMinutes())+':'+pad(Scores.lastSync.getSeconds())+'.':(Scores.ok?'Sincronizando…':'No se pudo sincronizar. Reintentando…');
+  }else st='Solo en este dispositivo. Conectá la nube desde el menú inicial para sincronizar entre dispositivos.';
+  const top=Scores.list.filter(r=>r&&r.finished&&r.total>0).sort((a,b)=>{
+    const pa=a.score/a.total,pb=b.score/b.total;
+    if(pb!==pa)return pb-pa;if(b.total!==a.total)return b.total-a.total;return a.startedAt-b.startedAt;
+  }).slice(0,10);
+  let h='<div class="status">'+esc(st)+'</div>';
+  if(!top.length)h+='<p class="status">Todavía no hay puntajes registrados.</p>';
+  top.forEach((r,i)=>{
+    const me=Track.rec&&r.id===Track.rec.id;
+    h+='<div class="srow'+(me?' me':'')+'"><span class="pos">'+(i+1)+'</span><div class="sinfo"><div class="sname">'+esc(r.name||'Sin nombre')+'</div><div class="sdate">'+fmtDate(r.startedAt)+'</div></div><span class="sbadge">'+S.star+' '+r.score+'/'+r.total+' · '+Math.round(r.score/r.total*100)+'%</span></div>';
+  });
+  ['scoreModalBody','scoreResBody'].forEach(id=>{const el=$(id);if(el)el.innerHTML=h});
+}
+
+/* ===== NUBE (Firebase Realtime Database por REST) ===== */
+const Cloud={
+  cfg:null,q:Promise.resolve(),
+  load(){try{this.cfg=JSON.parse(lsGet('quizCloud','null'))}catch(e){this.cfg=null}},
+  norm(u){
+    u=(u||'').trim();if(!u)return null;
+    if(!/^[a-z]+:\/\//i.test(u))u='https://'+u;
+    u=u.replace(/\/+$/,'').replace(/\.json$/i,'').replace(/\/+$/,'');
+    if(!/^https:\/\//i.test(u))return null;
+    try{const x=new URL(u);if(!x.hostname.includes('.'))return null}catch(e){return null}
+    return u;
+  },
+  keyOf(c){return c.trim().replace(/[.$#\[\]\/]/g,'_')},
+  addr(id){return this.cfg.url+'/scores/'+this.cfg.key+(id?'/'+encodeURIComponent(id):'')+'.json'},
+  async connect(){
+    const st=$('cStatus');
+    const url=this.norm($('cUrl').value);
+    if(!url){st.textContent='Pegá una URL válida que empiece con https://';return}
+    const code=$('cCode').value.trim();
+    if(!code){st.textContent='Elegí un código.';return}
+    const key=this.keyOf(code);
+    $('cOn').disabled=true;st.textContent='Conectando…';
+    try{
+      const r=await fetch(url+'/scores/'+key+'.json?shallow=true',{cache:'no-store'});
+      if(r.ok){
+        this.cfg={url:url,code:code,key:key};lsSet('quizCloud',JSON.stringify(this.cfg));
+        st.textContent='Conectado. Tus puntajes se sincronizan con este código.';
+        syncCloudUI();Scores.refresh().then(renderScoreViews);
+      }else if(r.status===401||r.status===403)st.textContent='Permiso denegado. Revisá las reglas de la base de datos.';
+      else if(r.status===404)st.textContent='No se encontró la base. Revisá la URL.';
+      else st.textContent='No se pudo conectar. Revisá la URL y tu conexión.';
+    }catch(e){st.textContent='No se pudo conectar. Revisá la URL y tu conexión.'}
+    $('cOn').disabled=false;
+  },
+  disconnect(){
+    this.cfg=null;try{localStorage.removeItem('quizCloud')}catch(e){}
+    $('cStatus').textContent='Desconectado. Los puntajes se guardan solo en este dispositivo.';
+    syncCloudUI();Scores.refresh().then(renderScoreViews);
+  },
+  put(rec){
+    this.q=this.q.then(()=>fetch(this.addr(rec.id),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(rec)}).then(r=>{if(!r.ok)throw 0}).then(()=>Scores.refresh()).then(renderScoreViews)).catch(()=>{});
+  },
+  del(id){
+    this.q=this.q.then(()=>fetch(this.addr(id),{method:'DELETE'}).then(()=>Scores.refresh()).then(renderScoreViews)).catch(()=>{});
+  }
+};
+function syncCloudUI(){
+  $('cloudBtn').classList.toggle('on',!!Cloud.cfg);
+  $('cOff').hidden=!Cloud.cfg;
+  if(Cloud.cfg){$('cUrl').value=Cloud.cfg.url;$('cCode').value=Cloud.cfg.code}
+}
+$('cloudBtn').onclick=()=>{
+  syncCloudUI();
+  if(!Cloud.cfg)$('cStatus').textContent='';
+  else $('cStatus').textContent='Conectado. Tus puntajes se sincronizan con este código.';
+  openOv('ovCloud');
+};
+$('cOn').onclick=()=>Cloud.connect();
+$('cOff').onclick=()=>Cloud.disconnect();
+
+/* ===== REGISTRO DE INTENTOS ===== */
+const Track={
+  rec:null,
+  _local(){try{return JSON.parse(lsGet('quizScores','[]'))||[]}catch(e){return[]}},
+  _save(rec){
+    rec.updatedAt=Date.now();
+    if(Cloud.cfg)Cloud.put(rec);
+    else{
+      const l=this._local().filter(r=>r.id!==rec.id);l.push(rec);
+      lsSet('quizScores',JSON.stringify(l.slice(-300)));
+      Scores.refresh().then(renderScoreViews);
+    }
+  },
+  start(name,total){
+    const id='q'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    this.rec={id:id,name:name||'',startedAt:Date.now(),score:0,answered:0,total:total,finished:false,updatedAt:Date.now()};
+    this._save(this.rec);
+  },
+  update(score,answered){if(!this.rec)return;this.rec.score=score;this.rec.answered=answered;this._save(this.rec)},
+  finish(){if(!this.rec)return;this.rec.finished=true;this.rec.finishedAt=Date.now();this._save(this.rec)},
+  abandonIfEmpty(){
+    if(!this.rec||this.rec.answered>0||this.rec.finished)return;
+    const id=this.rec.id;
+    if(Cloud.cfg)Cloud.del(id);
+    else{lsSet('quizScores',JSON.stringify(this._local().filter(r=>r.id!==id)))}
+    this.rec=null;
+  }
+};
+
+/* ===== INICIALIZACIÓN ===== */
+Cloud.load();
+UNITS.forEach(u=>selUnits.add(u));
+renderHome();syncCloudUI();
+Scores.refresh().then(renderScoreViews);
+setInterval(()=>{if(Cloud.cfg&&!document.hidden)Scores.refresh().then(renderScoreViews)},5000);
+</script>
+</body>
+</html>
